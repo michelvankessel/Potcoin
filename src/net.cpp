@@ -1197,13 +1197,13 @@ void MapPort(bool)
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
 static const char *strMainNetDNSSeed[][2] = {
-    {"seedz.potcoin.info", "dnsseedz.potcoin.info"},
-    {"dns1.potcoin.info","dns1.potcoin.info"},
+    {"potcoinseed.com", "dnsseed.potcoinseed.com"},
     {NULL, NULL}
 };
 
 static const char *strTestNetDNSSeed[][2] = {
-    {"testnet-seed.potcoin.com", "testnet-seed.potcoin.com"},
+    {"51.15.34.13", "51.15.34.13"},
+    {"51.15.55.7", "51.15.55.7"},
     {NULL, NULL}
 };
 
