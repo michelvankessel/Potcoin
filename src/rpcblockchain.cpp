@@ -47,7 +47,7 @@ double GetDifficulty(const CBlockIndex* blockindex)
 // PoSV
 double GetPoSVKernelPS()
 {
-    if (pindexBest == NULL || pindexBest->nHeight <= LAST_POW_BLOCK || !pindexBest->IsProofOfStake())
+    if (pindexBest == NULL || pindexBest->nHeight <= (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK) || !pindexBest->IsProofOfStake())
         return 0;
 
     double dStakeKernelsTriedAvg = GetDifficulty(pindexBest) * 4294967296.0; // 2^32

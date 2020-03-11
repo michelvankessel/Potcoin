@@ -24,7 +24,7 @@ Value GetNetworkHashPS(int lookup, int height) {
     if (height >= 0 && height < nBestHeight)
         pb = FindBlockByHeight(height);
 
-    if (pb == NULL || !pb->nHeight || pb->nHeight > LAST_POW_BLOCK)
+    if (pb == NULL || !pb->nHeight || pb->nHeight > (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
         return 0;
 
     // If lookup is -1, then use blocks since last difficulty change.
@@ -215,7 +215,7 @@ Value getworkex(const Array& params, bool fHelp)
     if (IsInitialBlockDownload())
         throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Potcoin is downloading blocks...");
 
-    if (pindexBest->nHeight >= LAST_POW_BLOCK)
+    if (pindexBest->nHeight >= (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
         throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
 
     typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;
@@ -358,7 +358,7 @@ Value getwork(const Array& params, bool fHelp)
     if (IsInitialBlockDownload())
         throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Potcoin is downloading blocks...");
 
-    if (pindexBest->nHeight >= LAST_POW_BLOCK)
+    if (pindexBest->nHeight >= (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
         throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
 
     typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;
@@ -516,7 +516,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
     if (IsInitialBlockDownload())
         throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Potcoin is downloading blocks...");
 
-    if (pindexBest->nHeight >= LAST_POW_BLOCK)
+    if (pindexBest->nHeight >= (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
         throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
 
     // Update block

@@ -1312,7 +1312,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend,
     }
 
     // Transactions in PoW phase should have the old version.
-    if (pindexBest->nHeight < LAST_POW_BLOCK)
+    if (pindexBest->nHeight < (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
         wtxNew.nVersion = POW_TX_VERSION;
 
     wtxNew.BindWallet(this);

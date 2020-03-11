@@ -119,7 +119,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     CBlock *pblock = &pblocktemplate->block; // pointer for convenience
     CBlockIndex* pindexPrev = pindexBest;
 
-    bool fProofOfStake = pindexPrev->nHeight >= LAST_POW_BLOCK;
+    bool fProofOfStake = pindexPrev->nHeight >= (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK);
 
     // Create coinbase tx
     CTransaction txNew;
@@ -585,7 +585,7 @@ void StakeMiner(CWallet *pwallet)
             }
         }
 
-        while (pindexBest->nHeight < LAST_POW_BLOCK)
+        while (pindexBest->nHeight < (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
             MilliSleep(60000);
 
         //

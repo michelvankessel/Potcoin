@@ -687,7 +687,7 @@ bool CTxMemPool::accept(CValidationState &state, CTransaction &tx, bool fCheckIn
         return state.DoS(100, error("CTxMemPool::accept() : coinstake as individual tx"));
 
     // PoSV: refuse transactions with old versions
-    if(pindexBest->nHeight >= LAST_POW_BLOCK && tx.nVersion <= POW_TX_VERSION)
+    if(pindexBest->nHeight >= (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK) && tx.nVersion <= POW_TX_VERSION)
         return state.DoS(100, error("CTxMemPool::accept() : tx with old pre-PoSV version"));
 
     // To help v0.1.5 clients who would see it as a negative number
@@ -1479,7 +1479,7 @@ unsigned int static GetPoSDifficulty(const CBlockIndex* pindexLast, const CBlock
     const CBlockIndex* pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, true);
 
 	// Reset difficulty for PoS switchover
-	if (pindexLast->nHeight < LAST_POW_BLOCK + 50)
+	if (pindexLast->nHeight < (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK) + 50)
 		return bnTargetLimit.GetCompact();
 
     int64 nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
@@ -1505,22 +1505,22 @@ unsigned int static GetPoSDifficulty(const CBlockIndex* pindexLast, const CBlock
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
     // always mine PoW blocks at the lowest diff on testnet
-    if (fTestNet && pindexLast->nHeight < LAST_POW_BLOCK)
+    if (fTestNet && pindexLast->nHeight < LAST_POW_BLOCK_TESTNET)
         return bnProofOfWorkLimit.GetCompact();
 
-	// New mode for PoS
-	if (pindexLast->nHeight >= LAST_POW_BLOCK)
-		return GetPoSDifficulty(pindexLast, pblock);
+    // New mode for PoS
+    if (pindexLast->nHeight >= (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
+        return GetPoSDifficulty(pindexLast, pblock);
 
     int DiffMode = 1;
     if (fTestNet) {
-    if (pindexLast->nHeight+1 >= NDIFF_START_KGW_TESTNET) { DiffMode = 2; }
-    if (pindexLast->nHeight+1 >= NDIFF_START_DIGISHIELD_TESTNET) { DiffMode = 3; }
-    printf("Into testnet @ block # %d Diffmode: %d\n", pindexLast->nHeight+1, DiffMode );
+        if (pindexLast->nHeight+1 >= NDIFF_START_KGW_TESTNET) { DiffMode = 2; }
+        if (pindexLast->nHeight+1 >= NDIFF_START_DIGISHIELD_TESTNET) { DiffMode = 3; }
+        printf("Into testnet @ block # %d Diffmode: %d\n", pindexLast->nHeight+1, DiffMode );
     }
     else {
-    if (pindexLast->nHeight+1 >= NDIFF_START_KGW) { DiffMode = 2; }
-    if (pindexLast->nHeight+1 >= NDIFF_START_DIGISHIELD) { DiffMode = 3; }
+        if (pindexLast->nHeight+1 >= NDIFF_START_KGW) { DiffMode = 2; }
+        if (pindexLast->nHeight+1 >= NDIFF_START_DIGISHIELD) { DiffMode = 3; }
     }
     if	(DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
     else if	(DiffMode == 2) { return GetNextWorkRequired_V2(pindexLast, pblock); }
@@ -2010,7 +2010,7 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
     bool fEnforceBIP30 = true;
 
     if (fEnforceBIP30) {
-        bool fProofOfStake = pindex->nHeight > LAST_POW_BLOCK;
+        bool fProofOfStake = pindex->nHeight > (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK);
         for (unsigned int i=fProofOfStake ? 1 : 0; i<vtx.size(); i++) {
             uint256 hash = GetTxHash(i);
             if (fDebug)
@@ -2706,7 +2706,7 @@ bool CBlock::AcceptBlock(CValidationState &state, CDiskBlockPos *dbp)
         pindexPrev = (*mi).second;
         nHeight = pindexPrev->nHeight+1;
 
-        if (IsProofOfWork() && nHeight > LAST_POW_BLOCK)
+        if (IsProofOfWork() && nHeight > (fTestNet ? LAST_POW_BLOCK_TESTNET : LAST_POW_BLOCK))
             return state.DoS(100, error("AcceptBlock() : reject proof-of-work at height %d", nHeight));
         // Check proof-of-work or proof-of-stake
         if (nBits != GetNextWorkRequired(pindexPrev, this))

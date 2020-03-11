@@ -95,6 +95,7 @@ inline int64 FutureDrift(int64 nTime) { return nTime + 10 * 60; } // up to 10 mi
 
 // Potcoin PoSV
 static const int LAST_POW_BLOCK = 975000 - 1;
+static const int LAST_POW_BLOCK_TESTNET = 10000 - 1; // 9999 for testnet
 static const int64 COIN_YEAR_REWARD = 5 * CENT; // 5% per year
 
 extern CScript COINBASE_FLAGS;
