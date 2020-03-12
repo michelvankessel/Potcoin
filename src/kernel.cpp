@@ -39,7 +39,7 @@ int64 GetCoinAgeWeightLinear(int64 nIntervalBeginning, int64 nIntervalEnd)
     // Kernel hash weight starts from 0 at the min age
     // this change increases active coins participating the hash and helps
     // to secure the network when proof-of-stake difficulty is low
-    return max((int64)0, min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64)nStakeMaxAge));
+    return max((int64)0, min(nIntervalEnd - nIntervalBeginning - (fTestNet ? nStakeMinAgeTestNet : nStakeMinAge), (int64)nStakeMaxAge));
 }
 
 /* PoSV: Coin-aging function
@@ -76,7 +76,7 @@ int64 GetCoinAgeWeight(int64 nIntervalBeginning, int64 nIntervalEnd)
         return 0;
     }
 
-    int64 nSeconds = max((int64)0, nIntervalEnd - nIntervalBeginning - nStakeMinAge);
+    int64 nSeconds = max((int64)0, nIntervalEnd - nIntervalBeginning - (fTestNet ? nStakeMinAgeTestNet : nStakeMinAge));
     double days = double(nSeconds) / (24 * 60 * 60);
     double weight = 0;
 
@@ -287,7 +287,7 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier
     {
         if (!pindex->pnext)
         {   // reached best block; may happen if node is behind on block chain
-            if (fPrintProofOfStake || (pindex->GetBlockTime() + nStakeMinAge - nStakeModifierSelectionInterval > GetAdjustedTime()))
+            if (fPrintProofOfStake || (pindex->GetBlockTime() + (fTestNet ? nStakeMinAgeTestNet : nStakeMinAge) - nStakeModifierSelectionInterval > GetAdjustedTime()))
                 return error("GetKernelStakeModifier() : reached best block at height %d from block at hight %d",
                     pindex->nHeight, pindexFrom->nHeight);
             else
@@ -338,7 +338,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
     if (nTimeTx < nTimeTxPrev)  // Transaction timestamp violation
         return error("CheckStakeKernelHash() : nTime violation: nTimeTx < txPrev.nTime");
 
-    if (nTimeBlockFrom + nStakeMinAge > nTimeTx) // Min age requirement
+    if (nTimeBlockFrom + (fTestNet ? nStakeMinAgeTestNet : nStakeMinAge) > nTimeTx) // Min age requirement
         return error("CheckStakeKernelHash() : min age violation");
 
     CBigNum bnTargetPerCoinDay;

@@ -90,6 +90,7 @@ static CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 static CBigNum bnProofOfStakeReset(~uint256(0) >> 32); // 1
 int64 nReserveBalance = 0;
 unsigned int nStakeMinAge = 8 * 60 * 60; // 8 hours
+unsigned int nStakeMinAgeTestNet = 10 * 60; // 10 minutes
 unsigned int nStakeMaxAge = 365 * 24 *  60 * 60; // 365 days
 extern enum Checkpoints::CPMode CheckpointsMode;
 
@@ -2388,7 +2389,7 @@ bool CTransaction::GetCoinAge(uint64& nCoinAge) const
             return false; // unable to read block of previous transaction
         if (!block.ReadFromDisk(mapBlockIndex[hashBlock]))
             return false; // unable to read block of previous transaction
-        if (block.nTime + nStakeMinAge > nTime)
+        if (block.nTime + (fTestNet ? nStakeMinAgeTestNet : nStakeMinAge) > nTime)
             continue; // only count coins meeting min age requirement
 
         // deal with missing timestamps in PoW blocks
@@ -4239,7 +4240,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 printf("  getblocks stopping at %d %s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str());
                 // ppcoin: tell downloading node about the latest block if it's
                 // without risk being rejected due to stake connection check
-                if (hashStop != hashBestChain && pindex->GetBlockTime() + nStakeMinAge > pindexBest->GetBlockTime())
+                if (hashStop != hashBestChain && pindex->GetBlockTime() + (fTestNet ? nStakeMinAgeTestNet : nStakeMinAge) > pindexBest->GetBlockTime())
                     pfrom->PushInventory(CInv(MSG_BLOCK, hashBestChain));
                 break;
             }

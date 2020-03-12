@@ -137,6 +137,7 @@ extern unsigned int nCoinCacheSize;
 // Potcoin PoSV
 extern std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 extern unsigned int nStakeMinAge;
+extern unsigned int nStakeMinAgeTestNet;
 extern unsigned int nStakeMaxAge;
 extern const int64 nTargetSpacing;
 extern int64 nLastCoinStakeSearchInterval;
