@@ -1153,7 +1153,7 @@ int64 GetBlockValue(int nHeight, int64 nFees)
 
 	}else{
 	  // Subsidy is cut in half every 280000 blocks, which will occur approximately every 4 months
-    nSubsidy >>= (nHeight / NDIFF_START_DIGISHIELD); // Potcoin: 280k blocks in ~4 months
+    nSubsidy >>= (nHeight / (fTestNet ? NDIFF_START_DIGISHIELD_TESTNET : NDIFF_START_DIGISHIELD)); // Potcoin: 280k blocks in ~4 months
   }
     return nSubsidy + nFees;
 }
