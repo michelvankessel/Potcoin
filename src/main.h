@@ -33,7 +33,7 @@ class CNode;
 #define FOUNDATION_ADDRESS "PLtnPUvmjtVsRSvhNNHXWozWNAuodannSY"
 #define NDIFF_START_MM_TESTNET 20
 #define NDIFF_START_FFOUNDATION_TESTNET 16
-#define NDIFF_START_DIGISHIELD_TESTNET 5000
+#define NDIFF_START_DIGISHIELD_TESTNET 15000
 #define NDIFF_START_KGW_TESTNET 5
 #define FOUNDATION_ADDRESS_TESTNET "PLtnPUvmjtVsRSvhNNHXWozWNAuodannSY"
 
@@ -95,7 +95,7 @@ inline int64 FutureDrift(int64 nTime) { return nTime + 10 * 60; } // up to 10 mi
 
 // Potcoin PoSV
 static const int LAST_POW_BLOCK = 975000 - 1;
-static const int LAST_POW_BLOCK_TESTNET = 10000 - 1; // 9999 for testnet
+static const int LAST_POW_BLOCK_TESTNET = 20000 - 1; // 19999 for testnet
 static const int64 COIN_YEAR_REWARD = 5 * CENT; // 5% per year
 
 extern CScript COINBASE_FLAGS;
