@@ -13,6 +13,8 @@ x86_64-w64-mingw32.static-qmake-qt5 \
 	BDB_LIB_PATH=$MXE_LIB_PATH \
 	MINIUPNPC_INCLUDE_PATH=$MXE_INCLUDE_PATH \
 	MINIUPNPC_LIB_PATH=$MXE_LIB_PATH \
-	QMAKE_LRELEASE=/mnt/c/Development/mxe/usr/x86_64-w64-mingw32.static/qt5/bin/lrelease potcoin-qt.pro
+	QRENCODE_INCLUDE_PATH=$MXE_INCLUDE_PATH \
+	QRENCODE_LIB_PATH=$MXE_LIB_PATH \
+	QMAKE_LRELEASE=/mnt/c/Development/mxe/usr/x86_64-w64-mingw32.static/qt5/bin/lrelease potcoin-qt.pro USE_QRCODE=1 USE_BUILD_INFO=1
 
-make -f Makefile.Release -j12
+make -f Makefile.Release -j$(nproc)
