@@ -17,6 +17,7 @@ typedef std::map<int, uint64> MapModifierCheckpoints;
 // which is roughly 7 hours 38 minutes, just a bit shorter than
 // the minimum stake age of 8 hours.
 unsigned int nModifierInterval = 13 * 60;
+unsigned int nModifierIntervalTestNet = 16;
 
 // FIXME
 // Hard checkpoints of stake modifiers to ensure they are deterministic
@@ -110,7 +111,7 @@ static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64& nStakeModifi
 static int64 GetStakeModifierSelectionIntervalSection(int nSection)
 {
     assert (nSection >= 0 && nSection < 64);
-    return (nModifierInterval * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));
+    return ((fTestNet ? nModifierIntervalTestNet : nModifierInterval) * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));
 }
 
 // Get stake modifier selection interval (in seconds)
@@ -202,14 +203,14 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64& nStakeModif
     {
         printf("ComputeNextStakeModifier: prev modifier=0x%016"PRI64x" time=%s height=%d\n", nStakeModifier, DateTimeStrFormat(nModifierTime).c_str(), pindexPrev->nHeight);
     }
-    if (nModifierTime / nModifierInterval >= pindexPrev->GetBlockTime() / nModifierInterval)
+    if (nModifierTime / (fTestNet ? nModifierIntervalTestNet : nModifierInterval) >= pindexPrev->GetBlockTime() / (fTestNet ? nModifierIntervalTestNet : nModifierInterval))
         return true;
 
     // Sort candidate blocks by timestamp
     vector<pair<int64, uint256> > vSortedByTimestamp;
-    vSortedByTimestamp.reserve(64 * nModifierInterval / nTargetSpacing);
+    vSortedByTimestamp.reserve(64 * (fTestNet ? nModifierIntervalTestNet : nModifierInterval) / nTargetSpacing);
     int64 nSelectionInterval = GetStakeModifierSelectionInterval();
-    int64 nSelectionIntervalStart = (pindexPrev->GetBlockTime() / nModifierInterval) * nModifierInterval - nSelectionInterval;
+    int64 nSelectionIntervalStart = (pindexPrev->GetBlockTime() / (fTestNet ? nModifierIntervalTestNet : nModifierInterval)) * (fTestNet ? nModifierIntervalTestNet : nModifierInterval) - nSelectionInterval;
     const CBlockIndex* pindex = pindexPrev;
     while (pindex && pindex->GetBlockTime() >= nSelectionIntervalStart)
     {
