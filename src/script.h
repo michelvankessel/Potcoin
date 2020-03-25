@@ -31,10 +31,10 @@ enum
 /** Script verification flags */
 enum
 {
-    SCRIPT_VERIFY_NONE      = 0,
-    SCRIPT_VERIFY_P2SH      = (1U << 0),
+    SCRIPT_VERIFY_NONE = 0,
+    SCRIPT_VERIFY_P2SH = (1U << 0),
     SCRIPT_VERIFY_STRICTENC = (1U << 1),
-    SCRIPT_VERIFY_NOCACHE   = (1U << 2),
+    SCRIPT_VERIFY_NOCACHE = (1U << 2),
 };
 
 enum txnouttype
@@ -47,7 +47,8 @@ enum txnouttype
     TX_MULTISIG,
 };
 
-class CNoDestination {
+class CNoDestination
+{
 public:
     friend bool operator==(const CNoDestination &a, const CNoDestination &b) { return true; }
     friend bool operator<(const CNoDestination &a, const CNoDestination &b) { return true; }
@@ -61,7 +62,7 @@ public:
  */
 typedef boost::variant<CNoDestination, CKeyID, CScriptID> CTxDestination;
 
-const char* GetTxnOutputType(txnouttype t);
+const char *GetTxnOutputType(txnouttype t);
 
 /** Script opcodes */
 enum opcodetype
@@ -75,7 +76,7 @@ enum opcodetype
     OP_1NEGATE = 0x4f,
     OP_RESERVED = 0x50,
     OP_1 = 0x51,
-    OP_TRUE=OP_1,
+    OP_TRUE = OP_1,
     OP_2 = 0x52,
     OP_3 = 0x53,
     OP_4 = 0x54,
@@ -198,8 +199,6 @@ enum opcodetype
     OP_NOP9 = 0xb8,
     OP_NOP10 = 0xb9,
 
-
-
     // template matching params
     OP_SMALLINTEGER = 0xfa,
     OP_PUBKEYS = 0xfb,
@@ -209,11 +208,9 @@ enum opcodetype
     OP_INVALIDOPCODE = 0xff,
 };
 
-const char* GetOpName(opcodetype opcode);
+const char *GetOpName(opcodetype opcode);
 
-
-
-inline std::string ValueString(const std::vector<unsigned char>& vch)
+inline std::string ValueString(const std::vector<unsigned char> &vch)
 {
     if (vch.size() <= 4)
         return strprintf("%d", CBigNum(vch).getint());
@@ -221,10 +218,10 @@ inline std::string ValueString(const std::vector<unsigned char>& vch)
         return HexStr(vch);
 }
 
-inline std::string StackString(const std::vector<std::vector<unsigned char> >& vStack)
+inline std::string StackString(const std::vector<std::vector<unsigned char>> &vStack)
 {
     std::string str;
-    BOOST_FOREACH(const std::vector<unsigned char>& vch, vStack)
+    BOOST_FOREACH (const std::vector<unsigned char> &vch, vStack)
     {
         if (!str.empty())
             str += " ";
@@ -233,18 +230,11 @@ inline std::string StackString(const std::vector<std::vector<unsigned char> >& v
     return str;
 }
 
-
-
-
-
-
-
-
 /** Serialized script, used inside transaction inputs and outputs */
 class CScript : public std::vector<unsigned char>
 {
 protected:
-    CScript& push_int64(int64 n)
+    CScript &push_int64(int64 n)
     {
         if (n == -1 || (n >= 1 && n <= 16))
         {
@@ -258,7 +248,7 @@ protected:
         return *this;
     }
 
-    CScript& push_uint64(uint64 n)
+    CScript &push_uint64(uint64 n)
     {
         if (n >= 1 && n <= 16)
         {
@@ -273,58 +263,58 @@ protected:
     }
 
 public:
-    CScript() { }
-    CScript(const CScript& b) : std::vector<unsigned char>(b.begin(), b.end()) { }
-    CScript(const_iterator pbegin, const_iterator pend) : std::vector<unsigned char>(pbegin, pend) { }
+    CScript() {}
+    CScript(const CScript &b) : std::vector<unsigned char>(b.begin(), b.end()) {}
+    CScript(const_iterator pbegin, const_iterator pend) : std::vector<unsigned char>(pbegin, pend) {}
 #ifndef _MSC_VER
-    CScript(const unsigned char* pbegin, const unsigned char* pend) : std::vector<unsigned char>(pbegin, pend) { }
+    CScript(const unsigned char *pbegin, const unsigned char *pend) : std::vector<unsigned char>(pbegin, pend)
+    {
+    }
 #endif
 
-    CScript& operator+=(const CScript& b)
+    CScript &operator+=(const CScript &b)
     {
         insert(end(), b.begin(), b.end());
         return *this;
     }
 
-    friend CScript operator+(const CScript& a, const CScript& b)
+    friend CScript operator+(const CScript &a, const CScript &b)
     {
         CScript ret = a;
         ret += b;
         return ret;
     }
 
-
     //explicit CScript(char b) is not portable.  Use 'signed char' or 'unsigned char'.
-    explicit CScript(signed char b)    { operator<<(b); }
-    explicit CScript(short b)          { operator<<(b); }
-    explicit CScript(int b)            { operator<<(b); }
-    explicit CScript(long b)           { operator<<(b); }
-    explicit CScript(int64 b)          { operator<<(b); }
-    explicit CScript(unsigned char b)  { operator<<(b); }
-    explicit CScript(unsigned int b)   { operator<<(b); }
+    explicit CScript(signed char b) { operator<<(b); }
+    explicit CScript(short b) { operator<<(b); }
+    explicit CScript(int b) { operator<<(b); }
+    explicit CScript(long b) { operator<<(b); }
+    explicit CScript(int64 b) { operator<<(b); }
+    explicit CScript(unsigned char b) { operator<<(b); }
+    explicit CScript(unsigned int b) { operator<<(b); }
     explicit CScript(unsigned short b) { operator<<(b); }
-    explicit CScript(unsigned long b)  { operator<<(b); }
-    explicit CScript(uint64 b)         { operator<<(b); }
+    explicit CScript(unsigned long b) { operator<<(b); }
+    explicit CScript(uint64 b) { operator<<(b); }
 
-    explicit CScript(opcodetype b)     { operator<<(b); }
-    explicit CScript(const uint256& b) { operator<<(b); }
-    explicit CScript(const CBigNum& b) { operator<<(b); }
-    explicit CScript(const std::vector<unsigned char>& b) { operator<<(b); }
-
+    explicit CScript(opcodetype b) { operator<<(b); }
+    explicit CScript(const uint256 &b) { operator<<(b); }
+    explicit CScript(const CBigNum &b) { operator<<(b); }
+    explicit CScript(const std::vector<unsigned char> &b) { operator<<(b); }
 
     //CScript& operator<<(char b) is not portable.  Use 'signed char' or 'unsigned char'.
-    CScript& operator<<(signed char b)    { return push_int64(b); }
-    CScript& operator<<(short b)          { return push_int64(b); }
-    CScript& operator<<(int b)            { return push_int64(b); }
-    CScript& operator<<(long b)           { return push_int64(b); }
-    CScript& operator<<(int64 b)          { return push_int64(b); }
-    CScript& operator<<(unsigned char b)  { return push_uint64(b); }
-    CScript& operator<<(unsigned int b)   { return push_uint64(b); }
-    CScript& operator<<(unsigned short b) { return push_uint64(b); }
-    CScript& operator<<(unsigned long b)  { return push_uint64(b); }
-    CScript& operator<<(uint64 b)         { return push_uint64(b); }
+    CScript &operator<<(signed char b) { return push_int64(b); }
+    CScript &operator<<(short b) { return push_int64(b); }
+    CScript &operator<<(int b) { return push_int64(b); }
+    CScript &operator<<(long b) { return push_int64(b); }
+    CScript &operator<<(int64 b) { return push_int64(b); }
+    CScript &operator<<(unsigned char b) { return push_uint64(b); }
+    CScript &operator<<(unsigned int b) { return push_uint64(b); }
+    CScript &operator<<(unsigned short b) { return push_uint64(b); }
+    CScript &operator<<(unsigned long b) { return push_uint64(b); }
+    CScript &operator<<(uint64 b) { return push_uint64(b); }
 
-    CScript& operator<<(opcodetype opcode)
+    CScript &operator<<(opcodetype opcode)
     {
         if (opcode < 0 || opcode > 0xff)
             throw std::runtime_error("CScript::operator<<() : invalid opcode");
@@ -332,21 +322,21 @@ public:
         return *this;
     }
 
-    CScript& operator<<(const uint160& b)
+    CScript &operator<<(const uint160 &b)
     {
         insert(end(), sizeof(b));
-        insert(end(), (unsigned char*)&b, (unsigned char*)&b + sizeof(b));
+        insert(end(), (unsigned char *)&b, (unsigned char *)&b + sizeof(b));
         return *this;
     }
 
-    CScript& operator<<(const uint256& b)
+    CScript &operator<<(const uint256 &b)
     {
         insert(end(), sizeof(b));
-        insert(end(), (unsigned char*)&b, (unsigned char*)&b + sizeof(b));
+        insert(end(), (unsigned char *)&b, (unsigned char *)&b + sizeof(b));
         return *this;
     }
 
-    CScript& operator<<(const CPubKey& key)
+    CScript &operator<<(const CPubKey &key)
     {
         assert(key.size() < OP_PUSHDATA1);
         insert(end(), (unsigned char)key.size());
@@ -354,13 +344,13 @@ public:
         return *this;
     }
 
-    CScript& operator<<(const CBigNum& b)
+    CScript &operator<<(const CBigNum &b)
     {
         *this << b.getvch();
         return *this;
     }
 
-    CScript& operator<<(const std::vector<unsigned char>& b)
+    CScript &operator<<(const std::vector<unsigned char> &b)
     {
         if (b.size() < OP_PUSHDATA1)
         {
@@ -375,19 +365,19 @@ public:
         {
             insert(end(), OP_PUSHDATA2);
             unsigned short nSize = b.size();
-            insert(end(), (unsigned char*)&nSize, (unsigned char*)&nSize + sizeof(nSize));
+            insert(end(), (unsigned char *)&nSize, (unsigned char *)&nSize + sizeof(nSize));
         }
         else
         {
             insert(end(), OP_PUSHDATA4);
             unsigned int nSize = b.size();
-            insert(end(), (unsigned char*)&nSize, (unsigned char*)&nSize + sizeof(nSize));
+            insert(end(), (unsigned char *)&nSize, (unsigned char *)&nSize + sizeof(nSize));
         }
         insert(end(), b.begin(), b.end());
         return *this;
     }
 
-    CScript& operator<<(const CScript& b)
+    CScript &operator<<(const CScript &b)
     {
         // I'm not sure if this should push the script or concatenate scripts.
         // If there's ever a use for pushing a script onto a script, delete this member fn
@@ -395,35 +385,34 @@ public:
         return *this;
     }
 
-
-    bool GetOp(iterator& pc, opcodetype& opcodeRet, std::vector<unsigned char>& vchRet)
+    bool GetOp(iterator &pc, opcodetype &opcodeRet, std::vector<unsigned char> &vchRet)
     {
-         // Wrapper so it can be called with either iterator or const_iterator
-         const_iterator pc2 = pc;
-         bool fRet = GetOp2(pc2, opcodeRet, &vchRet);
-         pc = begin() + (pc2 - begin());
-         return fRet;
+        // Wrapper so it can be called with either iterator or const_iterator
+        const_iterator pc2 = pc;
+        bool fRet = GetOp2(pc2, opcodeRet, &vchRet);
+        pc = begin() + (pc2 - begin());
+        return fRet;
     }
 
-    bool GetOp(iterator& pc, opcodetype& opcodeRet)
+    bool GetOp(iterator &pc, opcodetype &opcodeRet)
     {
-         const_iterator pc2 = pc;
-         bool fRet = GetOp2(pc2, opcodeRet, NULL);
-         pc = begin() + (pc2 - begin());
-         return fRet;
+        const_iterator pc2 = pc;
+        bool fRet = GetOp2(pc2, opcodeRet, NULL);
+        pc = begin() + (pc2 - begin());
+        return fRet;
     }
 
-    bool GetOp(const_iterator& pc, opcodetype& opcodeRet, std::vector<unsigned char>& vchRet) const
+    bool GetOp(const_iterator &pc, opcodetype &opcodeRet, std::vector<unsigned char> &vchRet) const
     {
         return GetOp2(pc, opcodeRet, &vchRet);
     }
 
-    bool GetOp(const_iterator& pc, opcodetype& opcodeRet) const
+    bool GetOp(const_iterator &pc, opcodetype &opcodeRet) const
     {
         return GetOp2(pc, opcodeRet, NULL);
     }
 
-    bool GetOp2(const_iterator& pc, opcodetype& opcodeRet, std::vector<unsigned char>* pvchRet) const
+    bool GetOp2(const_iterator &pc, opcodetype &opcodeRet, std::vector<unsigned char> *pvchRet) const
     {
         opcodeRet = OP_INVALIDOPCODE;
         if (pvchRet)
@@ -489,10 +478,10 @@ public:
         assert(n >= 0 && n <= 16);
         if (n == 0)
             return OP_0;
-        return (opcodetype)(OP_1+n-1);
+        return (opcodetype)(OP_1 + n - 1);
     }
 
-    int FindAndDelete(const CScript& b)
+    int FindAndDelete(const CScript &b)
     {
         int nFound = 0;
         if (b.empty())
@@ -506,8 +495,7 @@ public:
                 erase(pc, pc + b.size());
                 ++nFound;
             }
-        }
-        while (GetOp(pc, opcode));
+        } while (GetOp(pc, opcode));
         return nFound;
     }
     int Find(opcodetype op) const
@@ -529,7 +517,7 @@ public:
 
     // Accurately count sigOps, including sigOps in
     // pay-to-script-hash transactions:
-    unsigned int GetSigOpCount(const CScript& scriptSig) const;
+    unsigned int GetSigOpCount(const CScript &scriptSig) const;
 
     bool IsPayToScriptHash() const;
 
@@ -551,9 +539,8 @@ public:
     // Called by IsStandardTx.
     bool HasCanonicalPushes() const;
 
-    void SetDestination(const CTxDestination& address);
-    void SetMultisig(int nRequired, const std::vector<CPubKey>& keys);
-
+    void SetDestination(const CTxDestination &address);
+    void SetMultisig(int nRequired, const std::vector<CPubKey> &keys);
 
     void PrintHex() const
     {
@@ -615,6 +602,7 @@ private:
     static const unsigned int nSpecialScripts = 6;
 
     CScript &script;
+
 protected:
     // These check for scripts for which a special case with a shorter encoding is defined.
     // They are implemented separately from the CScript test, as these test for exact byte
@@ -628,10 +616,12 @@ protected:
     bool Compress(std::vector<unsigned char> &out) const;
     unsigned int GetSpecialSize(unsigned int nSize) const;
     bool Decompress(unsigned int nSize, const std::vector<unsigned char> &out);
-public:
-    CScriptCompressor(CScript &scriptIn) : script(scriptIn) { }
 
-    unsigned int GetSerializeSize(int nType, int nVersion) const {
+public:
+    CScriptCompressor(CScript &scriptIn) : script(scriptIn) {}
+
+    unsigned int GetSerializeSize(int nType, int nVersion) const
+    {
         std::vector<unsigned char> compr;
         if (Compress(compr))
             return compr.size();
@@ -639,10 +629,12 @@ public:
         return script.size() + VARINT(nSize).GetSerializeSize(nType, nVersion);
     }
 
-    template<typename Stream>
-    void Serialize(Stream &s, int nType, int nVersion) const {
+    template <typename Stream>
+    void Serialize(Stream &s, int nType, int nVersion) const
+    {
         std::vector<unsigned char> compr;
-        if (Compress(compr)) {
+        if (Compress(compr))
+        {
             s << CFlatData(&compr[0], &compr[compr.size()]);
             return;
         }
@@ -651,11 +643,13 @@ public:
         s << CFlatData(&script[0], &script[script.size()]);
     }
 
-    template<typename Stream>
-    void Unserialize(Stream &s, int nType, int nVersion) {
+    template <typename Stream>
+    void Unserialize(Stream &s, int nType, int nVersion)
+    {
         unsigned int nSize = 0;
         s >> VARINT(nSize);
-        if (nSize < nSpecialScripts) {
+        if (nSize < nSpecialScripts)
+        {
             std::vector<unsigned char> vch(GetSpecialSize(nSize), 0x00);
             s >> REF(CFlatData(&vch[0], &vch[vch.size()]));
             Decompress(nSize, vch);
@@ -670,21 +664,21 @@ public:
 bool IsCanonicalPubKey(const std::vector<unsigned char> &vchPubKey);
 bool IsCanonicalSignature(const std::vector<unsigned char> &vchSig);
 
-uint256 SignatureHash(CScript scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType);
-bool EvalScript(std::vector<std::vector<unsigned char> >& stack, const CScript& script, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType);
-bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet);
-int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned char> >& vSolutions);
-bool IsStandard(const CScript& scriptPubKey);
-bool IsMine(const CKeyStore& keystore, const CScript& scriptPubKey);
-bool IsMine(const CKeyStore& keystore, const CTxDestination &dest);
-bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet);
-bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<CTxDestination>& addressRet, int& nRequiredRet);
-bool SignSignature(const CKeyStore& keystore, const CScript& fromPubKey, CTransaction& txTo, unsigned int nIn, int nHashType=SIGHASH_ALL);
-bool SignSignature(const CKeyStore& keystore, const CTransaction& txFrom, CTransaction& txTo, unsigned int nIn, int nHashType=SIGHASH_ALL);
-bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType);
+uint256 SignatureHash(CScript scriptCode, const CTransaction &txTo, unsigned int nIn, int nHashType);
+bool EvalScript(std::vector<std::vector<unsigned char>> &stack, const CScript &script, const CTransaction &txTo, unsigned int nIn, unsigned int flags, int nHashType);
+bool Solver(const CScript &scriptPubKey, txnouttype &typeRet, std::vector<std::vector<unsigned char>> &vSolutionsRet);
+int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned char>> &vSolutions);
+bool IsStandard(const CScript &scriptPubKey);
+bool IsMine(const CKeyStore &keystore, const CScript &scriptPubKey);
+bool IsMine(const CKeyStore &keystore, const CTxDestination &dest);
+bool ExtractDestination(const CScript &scriptPubKey, CTxDestination &addressRet);
+bool ExtractDestinations(const CScript &scriptPubKey, txnouttype &typeRet, std::vector<CTxDestination> &addressRet, int &nRequiredRet);
+bool SignSignature(const CKeyStore &keystore, const CScript &fromPubKey, CTransaction &txTo, unsigned int nIn, int nHashType = SIGHASH_ALL);
+bool SignSignature(const CKeyStore &keystore, const CTransaction &txFrom, CTransaction &txTo, unsigned int nIn, int nHashType = SIGHASH_ALL);
+bool VerifyScript(const CScript &scriptSig, const CScript &scriptPubKey, const CTransaction &txTo, unsigned int nIn, unsigned int flags, int nHashType);
 
 // Given two sets of signatures for scriptPubKey, possibly with OP_0 placeholders,
 // combine them intelligently and return the result.
-CScript CombineSignatures(CScript scriptPubKey, const CTransaction& txTo, unsigned int nIn, const CScript& scriptSig1, const CScript& scriptSig2);
+CScript CombineSignatures(CScript scriptPubKey, const CTransaction &txTo, unsigned int nIn, const CScript &scriptSig1, const CScript &scriptSig2);
 
 #endif

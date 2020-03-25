@@ -48,7 +48,7 @@ private:
     unsigned int nTweak;
     unsigned char nFlags;
 
-    unsigned int Hash(unsigned int nHashNum, const std::vector<unsigned char>& vDataToHash) const;
+    unsigned int Hash(unsigned int nHashNum, const std::vector<unsigned char> &vDataToHash) const;
 
 public:
     // Creates a new bloom filter which will provide the given fp rate when filled with the given number of elements
@@ -61,28 +61,26 @@ public:
     CBloomFilter(unsigned int nElements, double nFPRate, unsigned int nTweak, unsigned char nFlagsIn);
     CBloomFilter() : isFull(true) {}
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         READWRITE(vData);
         READWRITE(nHashFuncs);
         READWRITE(nTweak);
-        READWRITE(nFlags);
-    )
+        READWRITE(nFlags);)
 
-    void insert(const std::vector<unsigned char>& vKey);
-    void insert(const COutPoint& outpoint);
-    void insert(const uint256& hash);
+    void insert(const std::vector<unsigned char> &vKey);
+    void insert(const COutPoint &outpoint);
+    void insert(const uint256 &hash);
 
-    bool contains(const std::vector<unsigned char>& vKey) const;
-    bool contains(const COutPoint& outpoint) const;
-    bool contains(const uint256& hash) const;
+    bool contains(const std::vector<unsigned char> &vKey) const;
+    bool contains(const COutPoint &outpoint) const;
+    bool contains(const uint256 &hash) const;
 
     // True if the size is <= MAX_BLOOM_FILTER_SIZE and the number of hash functions is <= MAX_HASH_FUNCS
     // (catch a filter which was just deserialized which was too big)
     bool IsWithinSizeConstraints() const;
 
     // Also adds any outputs which match the filter to the filter (to match their spending txes)
-    bool IsRelevantAndUpdate(const CTransaction& tx, const uint256& hash);
+    bool IsRelevantAndUpdate(const CTransaction &tx, const uint256 &hash);
 
     // Checks for empty and full filters to avoid wasting cpu
     void UpdateEmptyFull();

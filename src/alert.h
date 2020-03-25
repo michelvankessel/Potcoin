@@ -24,14 +24,14 @@ class CUnsignedAlert
 {
 public:
     int nVersion;
-    int64 nRelayUntil;      // when newer nodes stop relaying to newer nodes
+    int64 nRelayUntil; // when newer nodes stop relaying to newer nodes
     int64 nExpiration;
     int nID;
     int nCancel;
     std::set<int> setCancel;
-    int nMinVer;            // lowest version inclusive
-    int nMaxVer;            // highest version inclusive
-    std::set<std::string> setSubVer;  // empty matches all
+    int nMinVer;                     // lowest version inclusive
+    int nMaxVer;                     // highest version inclusive
+    std::set<std::string> setSubVer; // empty matches all
     int nPriority;
 
     // Actions
@@ -39,8 +39,7 @@ public:
     std::string strStatusBar;
     std::string strReserved;
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nRelayUntil);
@@ -55,8 +54,7 @@ public:
 
         READWRITE(strComment);
         READWRITE(strStatusBar);
-        READWRITE(strReserved);
-    )
+        READWRITE(strReserved);)
 
     void SetNull();
 
@@ -76,20 +74,18 @@ public:
         SetNull();
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         READWRITE(vchMsg);
-        READWRITE(vchSig);
-    )
+        READWRITE(vchSig);)
 
     void SetNull();
     bool IsNull() const;
     uint256 GetHash() const;
     bool IsInEffect() const;
-    bool Cancels(const CAlert& alert) const;
+    bool Cancels(const CAlert &alert) const;
     bool AppliesTo(int nVersion, std::string strSubVerIn) const;
     bool AppliesToMe() const;
-    bool RelayTo(CNode* pnode) const;
+    bool RelayTo(CNode *pnode) const;
     bool CheckSignature() const;
     bool ProcessAlert(bool fThread = true);
 

@@ -12,7 +12,8 @@
 
 #include <boost/filesystem.hpp>
 
-void HandleError(const leveldb::Status &status) throw(leveldb_error) {
+void HandleError(const leveldb::Status &status) throw(leveldb_error)
+{
     if (status.ok())
         return;
     if (status.IsCorruption())
@@ -24,7 +25,8 @@ void HandleError(const leveldb::Status &status) throw(leveldb_error) {
     throw leveldb_error("Unknown database error");
 }
 
-static leveldb::Options GetOptions(size_t nCacheSize) {
+static leveldb::Options GetOptions(size_t nCacheSize)
+{
     leveldb::Options options;
     options.block_cache = leveldb::NewLRUCache(nCacheSize / 2);
     options.write_buffer_size = nCacheSize / 4; // up to two write buffers may be held in memory simultaneously
@@ -34,7 +36,8 @@ static leveldb::Options GetOptions(size_t nCacheSize) {
     return options;
 }
 
-CLevelDB::CLevelDB(const boost::filesystem::path &path, size_t nCacheSize, bool fMemory, bool fWipe) {
+CLevelDB::CLevelDB(const boost::filesystem::path &path, size_t nCacheSize, bool fMemory, bool fWipe)
+{
     penv = NULL;
     readoptions.verify_checksums = true;
     iteroptions.verify_checksums = true;
@@ -42,11 +45,15 @@ CLevelDB::CLevelDB(const boost::filesystem::path &path, size_t nCacheSize, bool 
     syncoptions.sync = true;
     options = GetOptions(nCacheSize);
     options.create_if_missing = true;
-    if (fMemory) {
+    if (fMemory)
+    {
         penv = leveldb::NewMemEnv(leveldb::Env::Default());
         options.env = penv;
-    } else {
-        if (fWipe) {
+    }
+    else
+    {
+        if (fWipe)
+        {
             printf("Wiping LevelDB in %s\n", path.string().c_str());
             leveldb::DestroyDB(path.string(), options);
         }
@@ -59,7 +66,8 @@ CLevelDB::CLevelDB(const boost::filesystem::path &path, size_t nCacheSize, bool 
     printf("Opened LevelDB successfully\n");
 }
 
-CLevelDB::~CLevelDB() {
+CLevelDB::~CLevelDB()
+{
     delete pdb;
     pdb = NULL;
     delete options.filter_policy;
@@ -70,9 +78,11 @@ CLevelDB::~CLevelDB() {
     options.env = NULL;
 }
 
-bool CLevelDB::WriteBatch(CLevelDBBatch &batch, bool fSync) throw(leveldb_error) {
+bool CLevelDB::WriteBatch(CLevelDBBatch &batch, bool fSync) throw(leveldb_error)
+{
     leveldb::Status status = pdb->Write(fSync ? syncoptions : writeoptions, &batch.batch);
-    if (!status.ok()) {
+    if (!status.ok())
+    {
         printf("LevelDB write failure: %s\n", status.ToString().c_str());
         HandleError(status);
         return false;

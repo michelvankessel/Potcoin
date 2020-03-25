@@ -19,8 +19,8 @@ using namespace std;
 map<uint256, CAlert> mapAlerts;
 CCriticalSection cs_mapAlerts;
 
-static const char* pszMainKey = "03eb63e8fe22172205bcdd4a92932a778b41e1fa21e16321ac67487d039b255690";
-static const char* pszTestKey = "048b75ab041ee9965f6f57ee299395c02daf5105f208fc49e908804aad3ace5a77c7f87b3aae74d6698124f20c3d1bea31c9fcdd350c9c61c0113fd988ecfb5c09";
+static const char *pszMainKey = "03eb63e8fe22172205bcdd4a92932a778b41e1fa21e16321ac67487d039b255690";
+static const char *pszTestKey = "048b75ab041ee9965f6f57ee299395c02daf5105f208fc49e908804aad3ace5a77c7f87b3aae74d6698124f20c3d1bea31c9fcdd350c9c61c0113fd988ecfb5c09";
 
 void CUnsignedAlert::SetNull()
 {
@@ -43,16 +43,16 @@ void CUnsignedAlert::SetNull()
 std::string CUnsignedAlert::ToString() const
 {
     std::string strSetCancel;
-    BOOST_FOREACH(int n, setCancel)
+    BOOST_FOREACH (int n, setCancel)
         strSetCancel += strprintf("%d ", n);
     std::string strSetSubVer;
-    BOOST_FOREACH(std::string str, setSubVer)
+    BOOST_FOREACH (std::string str, setSubVer)
         strSetSubVer += "\"" + str + "\" ";
     return strprintf(
         "CAlert(\n"
         "    nVersion     = %d\n"
-        "    nRelayUntil  = %"PRI64d"\n"
-        "    nExpiration  = %"PRI64d"\n"
+        "    nRelayUntil  = %" PRI64d "\n"
+        "    nExpiration  = %" PRI64d "\n"
         "    nID          = %d\n"
         "    nCancel      = %d\n"
         "    setCancel    = %s\n"
@@ -104,7 +104,7 @@ bool CAlert::IsInEffect() const
     return (GetAdjustedTime() < nExpiration);
 }
 
-bool CAlert::Cancels(const CAlert& alert) const
+bool CAlert::Cancels(const CAlert &alert) const
 {
     if (!IsInEffect())
         return false; // this was a no-op before 31403
@@ -124,7 +124,7 @@ bool CAlert::AppliesToMe() const
     return AppliesTo(PROTOCOL_VERSION, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<std::string>()));
 }
 
-bool CAlert::RelayTo(CNode* pnode) const
+bool CAlert::RelayTo(CNode *pnode) const
 {
     if (!IsInEffect())
         return false;
@@ -150,7 +150,7 @@ bool CAlert::CheckSignature() const
 
     // Now unserialize the data
     CDataStream sMsg(vchMsg, SER_NETWORK, PROTOCOL_VERSION);
-    sMsg >> *(CUnsignedAlert*)this;
+    sMsg >> *(CUnsignedAlert *)this;
     return true;
 }
 
@@ -160,7 +160,7 @@ CAlert CAlert::getAlertByHash(const uint256 &hash)
     {
         LOCK(cs_mapAlerts);
         map<uint256, CAlert>::iterator mi = mapAlerts.find(hash);
-        if(mi != mapAlerts.end())
+        if (mi != mapAlerts.end())
             retval = mi->second;
     }
     return retval;
@@ -185,13 +185,12 @@ bool CAlert::ProcessAlert(bool fThread)
     {
         if (!(
                 nExpiration == maxInt &&
-                nCancel == (maxInt-1) &&
+                nCancel == (maxInt - 1) &&
                 nMinVer == 0 &&
                 nMaxVer == maxInt &&
                 setSubVer.empty() &&
                 nPriority == maxInt &&
-                strStatusBar == "URGENT: Alert key compromised, upgrade required"
-                ))
+                strStatusBar == "URGENT: Alert key compromised, upgrade required"))
             return false;
     }
 
@@ -200,7 +199,7 @@ bool CAlert::ProcessAlert(bool fThread)
         // Cancel previous alerts
         for (map<uint256, CAlert>::iterator mi = mapAlerts.begin(); mi != mapAlerts.end();)
         {
-            const CAlert& alert = (*mi).second;
+            const CAlert &alert = (*mi).second;
             if (Cancels(alert))
             {
                 printf("cancelling alert %d\n", alert.nID);
@@ -218,9 +217,9 @@ bool CAlert::ProcessAlert(bool fThread)
         }
 
         // Check if this alert has been cancelled
-        BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
+        BOOST_FOREACH (PAIRTYPE(const uint256, CAlert) & item, mapAlerts)
         {
-            const CAlert& alert = item.second;
+            const CAlert &alert = item.second;
             if (alert.Cancels(*this))
             {
                 printf("alert already cancelled by %d\n", alert.nID);
@@ -231,7 +230,7 @@ bool CAlert::ProcessAlert(bool fThread)
         // Add to mapAlerts
         mapAlerts.insert(make_pair(GetHash(), *this));
         // Notify UI and -alertnotify if it applies to me
-        if(AppliesToMe())
+        if (AppliesToMe())
         {
             uiInterface.NotifyAlertChanged(GetHash(), CT_NEW);
             std::string strCmd = GetArg("-alertnotify", "");
@@ -242,7 +241,7 @@ bool CAlert::ProcessAlert(bool fThread)
                 // the whole string before passing it to the shell:
                 std::string singleQuote("'");
                 std::string safeStatus = SanitizeString(strStatusBar);
-                safeStatus = singleQuote+safeStatus+singleQuote;
+                safeStatus = singleQuote + safeStatus + singleQuote;
                 boost::replace_all(strCmd, "%s", safeStatus);
 
                 if (fThread)

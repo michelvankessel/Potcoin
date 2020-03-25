@@ -20,9 +20,9 @@ public:
     CBlockIndex *pindex;
     int64 nValue;
     bool fSpent;
-    CWalletTx* ptx;
+    CWalletTx *ptx;
     int nOut;
-    CTxDump(CWalletTx* ptx = NULL, int nOut = -1)
+    CTxDump(CWalletTx *ptx = NULL, int nOut = -1)
     {
         pindex = NULL;
         nValue = 0;
@@ -32,7 +32,7 @@ public:
     }
 };
 
-Value importprivkey(const Array& params, bool fHelp)
+Value importprivkey(const Array &params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 3)
         throw runtime_error(
@@ -54,13 +54,16 @@ Value importprivkey(const Array& params, bool fHelp)
     CBitcoinSecret vchSecret;
     bool fGood = vchSecret.SetString(strSecret);
 
-    if (!fGood) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid private key encoding");
-    if (fWalletUnlockStakingOnly) throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Wallet is unlocked for staking only.");
+    if (!fGood)
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid private key encoding");
+    if (fWalletUnlockStakingOnly)
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Wallet is unlocked for staking only.");
 
     CKey key = vchSecret.GetKey();
     CPubKey pubkey = key.GetPubKey();
     CKeyID vchAddress = pubkey.GetID();
-    if (!key.IsValid()) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Private key outside allowed range");
+    if (!key.IsValid())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Private key outside allowed range");
 
     {
         LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -71,7 +74,8 @@ Value importprivkey(const Array& params, bool fHelp)
         if (!pwalletMain->AddKeyPubKey(key, pubkey))
             throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
 
-        if (fRescan) {
+        if (fRescan)
+        {
             pwalletMain->ScanForWalletTransactions(pindexGenesisBlock, true);
             pwalletMain->ReacceptWalletTransactions();
         }
@@ -80,7 +84,7 @@ Value importprivkey(const Array& params, bool fHelp)
     return Value::null;
 }
 
-Value dumpprivkey(const Array& params, bool fHelp)
+Value dumpprivkey(const Array &params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(

@@ -16,10 +16,7 @@
 using namespace std;
 using namespace boost;
 
-
 unsigned int nWalletDBUpdated;
-
-
 
 //
 // CDB
@@ -56,7 +53,7 @@ void CDBEnv::Close()
     EnvShutdown();
 }
 
-bool CDBEnv::Open(const boost::filesystem::path& pathIn)
+bool CDBEnv::Open(const boost::filesystem::path &pathIn)
 {
     if (fDbEnvInit)
         return true;
@@ -84,15 +81,15 @@ bool CDBEnv::Open(const boost::filesystem::path& pathIn)
     dbenv.set_flags(DB_TXN_WRITE_NOSYNC, 1);
     dbenv.log_set_config(DB_LOG_AUTO_REMOVE, 1);
     int ret = dbenv.open(path.string().c_str(),
-                     DB_CREATE     |
-                     DB_INIT_LOCK  |
-                     DB_INIT_LOG   |
-                     DB_INIT_MPOOL |
-                     DB_INIT_TXN   |
-                     DB_THREAD     |
-                     DB_RECOVER    |
-                     nEnvFlags,
-                     S_IRUSR | S_IWUSR);
+                         DB_CREATE |
+                             DB_INIT_LOCK |
+                             DB_INIT_LOG |
+                             DB_INIT_MPOOL |
+                             DB_INIT_TXN |
+                             DB_THREAD |
+                             DB_RECOVER |
+                             nEnvFlags,
+                         S_IRUSR | S_IWUSR);
     if (ret != 0)
         return error("CDB() : error %s (%d) opening database environment", DbEnv::strerror(ret), ret);
 
@@ -111,21 +108,21 @@ void CDBEnv::MakeMock()
     printf("CDBEnv::MakeMock()\n");
 
     dbenv.set_cachesize(1, 0, 1);
-    dbenv.set_lg_bsize(10485760*4);
+    dbenv.set_lg_bsize(10485760 * 4);
     dbenv.set_lg_max(10485760);
     dbenv.set_lk_max_locks(10000);
     dbenv.set_lk_max_objects(10000);
     dbenv.set_flags(DB_AUTO_COMMIT, 1);
     dbenv.log_set_config(DB_LOG_IN_MEMORY, 1);
     int ret = dbenv.open(NULL,
-                     DB_CREATE     |
-                     DB_INIT_LOCK  |
-                     DB_INIT_LOG   |
-                     DB_INIT_MPOOL |
-                     DB_INIT_TXN   |
-                     DB_THREAD     |
-                     DB_PRIVATE,
-                     S_IRUSR | S_IWUSR);
+                         DB_CREATE |
+                             DB_INIT_LOCK |
+                             DB_INIT_LOG |
+                             DB_INIT_MPOOL |
+                             DB_INIT_TXN |
+                             DB_THREAD |
+                             DB_PRIVATE,
+                         S_IRUSR | S_IWUSR);
     if (ret > 0)
         throw runtime_error(strprintf("CDBEnv::MakeMock(): error %d opening database environment", ret));
 
@@ -133,7 +130,7 @@ void CDBEnv::MakeMock()
     fMockDb = true;
 }
 
-CDBEnv::VerifyResult CDBEnv::Verify(std::string strFile, bool (*recoverFunc)(CDBEnv& dbenv, std::string strFile))
+CDBEnv::VerifyResult CDBEnv::Verify(std::string strFile, bool (*recoverFunc)(CDBEnv &dbenv, std::string strFile))
 {
     LOCK(cs_db);
     assert(mapFileUseCount.count(strFile) == 0);
@@ -151,13 +148,14 @@ CDBEnv::VerifyResult CDBEnv::Verify(std::string strFile, bool (*recoverFunc)(CDB
 }
 
 bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
-                     std::vector<CDBEnv::KeyValPair >& vResult)
+                     std::vector<CDBEnv::KeyValPair> &vResult)
 {
     LOCK(cs_db);
     assert(mapFileUseCount.count(strFile) == 0);
 
     u_int32_t flags = DB_SALVAGE;
-    if (fAggressive) flags |= DB_AGGRESSIVE;
+    if (fAggressive)
+        flags |= DB_AGGRESSIVE;
 
     stringstream strDump;
 
@@ -174,7 +172,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
     }
     if (result != 0 && result != DB_VERIFY_BAD)
     {
-        printf("ERROR: db salvage failed: %d\n",result);
+        printf("ERROR: db salvage failed: %d\n", result);
         return false;
     }
 
@@ -197,13 +195,12 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
         if (keyHex != "DATA_END")
         {
             getline(strDump, valueHex);
-            vResult.push_back(make_pair(ParseHex(keyHex),ParseHex(valueHex)));
+            vResult.push_back(make_pair(ParseHex(keyHex), ParseHex(valueHex)));
         }
     }
 
     return (result == 0);
 }
-
 
 void CDBEnv::CheckpointLSN(std::string strFile)
 {
@@ -213,9 +210,7 @@ void CDBEnv::CheckpointLSN(std::string strFile)
     dbenv.lsn_reset(strFile.c_str(), 0);
 }
 
-
-CDB::CDB(const char *pszFile, const char* pszMode) :
-    pdb(NULL), activeTxn(NULL)
+CDB::CDB(const char *pszFile, const char *pszMode) : pdb(NULL), activeTxn(NULL)
 {
     int ret;
     if (pszFile == NULL)
@@ -242,17 +237,17 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
             bool fMockDb = bitdb.IsMock();
             if (fMockDb)
             {
-                DbMpoolFile*mpf = pdb->get_mpf();
+                DbMpoolFile *mpf = pdb->get_mpf();
                 ret = mpf->set_flags(DB_MPOOL_NOFILE, 1);
                 if (ret != 0)
                     throw runtime_error(strprintf("CDB() : failed to configure for no temp file backing for database %s", pszFile));
             }
 
-            ret = pdb->open(NULL,      // Txn pointer
+            ret = pdb->open(NULL,                       // Txn pointer
                             fMockDb ? NULL : pszFile,   // Filename
                             fMockDb ? pszFile : "main", // Logical db name
-                            DB_BTREE,  // Database type
-                            nFlags,    // Flags
+                            DB_BTREE,                   // Database type
+                            nFlags,                     // Flags
                             0);
 
             if (ret != 0)
@@ -287,7 +282,7 @@ void CDB::Flush()
     if (fReadOnly)
         nMinutes = 1;
 
-    bitdb.dbenv.txn_checkpoint(nMinutes ? GetArg("-dblogsize", 100)*1024 : 0, nMinutes, 0);
+    bitdb.dbenv.txn_checkpoint(nMinutes ? GetArg("-dblogsize", 100) * 1024 : 0, nMinutes, 0);
 }
 
 void CDB::Close()
@@ -307,14 +302,14 @@ void CDB::Close()
     }
 }
 
-void CDBEnv::CloseDb(const string& strFile)
+void CDBEnv::CloseDb(const string &strFile)
 {
     {
         LOCK(cs_db);
         if (mapDb[strFile] != NULL)
         {
             // Close the database handle
-            Db* pdb = mapDb[strFile];
+            Db *pdb = mapDb[strFile];
             pdb->close(0);
             delete pdb;
             mapDb[strFile] = NULL;
@@ -322,7 +317,7 @@ void CDBEnv::CloseDb(const string& strFile)
     }
 }
 
-bool CDBEnv::RemoveDb(const string& strFile)
+bool CDBEnv::RemoveDb(const string &strFile)
 {
     this->CloseDb(strFile);
 
@@ -331,7 +326,7 @@ bool CDBEnv::RemoveDb(const string& strFile)
     return (rc == 0);
 }
 
-bool CDB::Rewrite(const string& strFile, const char* pszSkip)
+bool CDB::Rewrite(const string &strFile, const char *pszSkip)
 {
     while (true)
     {
@@ -349,13 +344,13 @@ bool CDB::Rewrite(const string& strFile, const char* pszSkip)
                 string strFileRes = strFile + ".rewrite";
                 { // surround usage of db with extra {}
                     CDB db(strFile.c_str(), "r");
-                    Db* pdbCopy = new Db(&bitdb.dbenv, 0);
+                    Db *pdbCopy = new Db(&bitdb.dbenv, 0);
 
-                    int ret = pdbCopy->open(NULL,                 // Txn pointer
-                                            strFileRes.c_str(),   // Filename
-                                            "main",    // Logical db name
-                                            DB_BTREE,  // Database type
-                                            DB_CREATE,    // Flags
+                    int ret = pdbCopy->open(NULL,               // Txn pointer
+                                            strFileRes.c_str(), // Filename
+                                            "main",             // Logical db name
+                                            DB_BTREE,           // Database type
+                                            DB_CREATE,          // Flags
                                             0);
                     if (ret > 0)
                     {
@@ -363,7 +358,7 @@ bool CDB::Rewrite(const string& strFile, const char* pszSkip)
                         fSuccess = false;
                     }
 
-                    Dbc* pcursor = db.GetCursor();
+                    Dbc *pcursor = db.GetCursor();
                     if (pcursor)
                         while (fSuccess)
                         {
@@ -424,7 +419,6 @@ bool CDB::Rewrite(const string& strFile, const char* pszSkip)
     return false;
 }
 
-
 void CDBEnv::Flush(bool fShutdown)
 {
     int64 nStart = GetTimeMillis();
@@ -456,10 +450,10 @@ void CDBEnv::Flush(bool fShutdown)
             else
                 mi++;
         }
-        printf("DBFlush(%s)%s ended %15"PRI64d"ms\n", fShutdown ? "true" : "false", fDbEnvInit ? "" : " db not started", GetTimeMillis() - nStart);
+        printf("DBFlush(%s)%s ended %15" PRI64d "ms\n", fShutdown ? "true" : "false", fDbEnvInit ? "" : " db not started", GetTimeMillis() - nStart);
         if (fShutdown)
         {
-            char** listp;
+            char **listp;
             if (mapFileUseCount.empty())
             {
                 dbenv.log_archive(&listp, DB_ARCH_REMOVE);
@@ -471,27 +465,16 @@ void CDBEnv::Flush(bool fShutdown)
     }
 }
 
-
-
-
-
-
-
-
-
-
-
 //
 // CAddrDB
 //
-
 
 CAddrDB::CAddrDB()
 {
     pathAddr = GetDataDir() / "peers.dat";
 }
 
-bool CAddrDB::Write(const CAddrMan& addr)
+bool CAddrDB::Write(const CAddrMan &addr)
 {
     // Generate random temporary filename
     unsigned short randv = 0;
@@ -513,10 +496,12 @@ bool CAddrDB::Write(const CAddrMan& addr)
         return error("CAddrman::Write() : open failed");
 
     // Write and commit header, data
-    try {
+    try
+    {
         fileout << ssPeers;
     }
-    catch (std::exception &e) {
+    catch (std::exception &e)
+    {
         return error("CAddrman::Write() : I/O error");
     }
     FileCommit(fileout);
@@ -529,7 +514,7 @@ bool CAddrDB::Write(const CAddrMan& addr)
     return true;
 }
 
-bool CAddrDB::Read(CAddrMan& addr)
+bool CAddrDB::Read(CAddrMan &addr)
 {
     // open input file, and associate with CAutoFile
     FILE *file = fopen(pathAddr.string().c_str(), "rb");
@@ -541,17 +526,20 @@ bool CAddrDB::Read(CAddrMan& addr)
     int fileSize = GetFilesize(filein);
     int dataSize = fileSize - sizeof(uint256);
     //Don't try to resize to a negative number if file is small
-    if ( dataSize < 0 ) dataSize = 0;
+    if (dataSize < 0)
+        dataSize = 0;
     vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
 
     // read data and checksum from file
-    try {
+    try
+    {
         filein.read((char *)&vchData[0], dataSize);
         filein >> hashIn;
     }
-    catch (std::exception &e) {
+    catch (std::exception &e)
+    {
         return error("CAddrman::Read() 2 : I/O error or stream data corrupted");
     }
     filein.fclose();
@@ -564,7 +552,8 @@ bool CAddrDB::Read(CAddrMan& addr)
         return error("CAddrman::Read() : checksum mismatch; data corrupted");
 
     unsigned char pchMsgTmp[4];
-    try {
+    try
+    {
         // de-serialize file header (pchMessageStart magic number) and
         ssPeers >> FLATDATA(pchMsgTmp);
 
@@ -575,10 +564,10 @@ bool CAddrDB::Read(CAddrMan& addr)
         // de-serialize address data into one CAddrMan object
         ssPeers >> addr;
     }
-    catch (std::exception &e) {
+    catch (std::exception &e)
+    {
         return error("CAddrman::Read() : I/O error or stream data corrupted");
     }
 
     return true;
 }
-

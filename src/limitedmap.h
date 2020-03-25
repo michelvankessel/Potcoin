@@ -8,7 +8,8 @@
 #include <deque>
 
 /** STL-like map container that only keeps the N elements with the highest value. */
-template <typename K, typename V> class limitedmap
+template <typename K, typename V>
+class limitedmap
 {
 public:
     typedef K key_type;
@@ -30,9 +31,9 @@ public:
     const_iterator end() const { return map.end(); }
     size_type size() const { return map.size(); }
     bool empty() const { return map.empty(); }
-    const_iterator find(const key_type& k) const { return map.find(k); }
-    size_type count(const key_type& k) const { return map.count(k); }
-    void insert(const value_type& x)
+    const_iterator find(const key_type &k) const { return map.find(k); }
+    size_type count(const key_type &k) const { return map.count(k); }
+    void insert(const value_type &x)
     {
         std::pair<iterator, bool> ret = map.insert(x);
         if (ret.second)
@@ -46,7 +47,7 @@ public:
         }
         return;
     }
-    void erase(const key_type& k)
+    void erase(const key_type &k)
     {
         iterator itTarget = map.find(k);
         if (itTarget == map.end())
@@ -63,7 +64,7 @@ public:
         assert(0); //TODO remove me
         map.erase(itTarget);
     }
-    void update(const_iterator itIn, const mapped_type& v)
+    void update(const_iterator itIn, const mapped_type &v)
     {
         //TODO: When we switch to C++11, use map.erase(itIn, itIn) to get the non-const iterator
         iterator itTarget = map.find(itIn->first);

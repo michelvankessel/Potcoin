@@ -9,11 +9,12 @@
 
 #include <string>
 
-static bool noui_ThreadSafeMessageBox(const std::string& message, const std::string& caption, unsigned int style)
+static bool noui_ThreadSafeMessageBox(const std::string &message, const std::string &caption, unsigned int style)
 {
     std::string strCaption;
     // Check for usage of predefined caption
-    switch (style) {
+    switch (style)
+    {
     case CClientUIInterface::MSG_ERROR:
         strCaption += _("Error");
         break;

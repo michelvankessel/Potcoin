@@ -9,16 +9,15 @@
 #include "main.h"
 
 #ifndef WIN32
-# include <arpa/inet.h>
+#include <arpa/inet.h>
 #endif
 
-static const char* ppszTypeName[] =
-{
-    "ERROR",
-    "tx",
-    "block",
-    "filtered block"
-};
+static const char *ppszTypeName[] =
+    {
+        "ERROR",
+        "tx",
+        "block",
+        "filtered block"};
 
 CMessageHeader::CMessageHeader()
 {
@@ -29,7 +28,7 @@ CMessageHeader::CMessageHeader()
     nChecksum = 0;
 }
 
-CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn)
+CMessageHeader::CMessageHeader(const char *pszCommand, unsigned int nMessageSizeIn)
 {
     memcpy(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart));
     strncpy(pchCommand, pszCommand, COMMAND_SIZE);
@@ -39,7 +38,7 @@ CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSize
 
 std::string CMessageHeader::GetCommand() const
 {
-    if (pchCommand[COMMAND_SIZE-1] == 0)
+    if (pchCommand[COMMAND_SIZE - 1] == 0)
         return std::string(pchCommand, pchCommand + strlen(pchCommand));
     else
         return std::string(pchCommand, pchCommand + COMMAND_SIZE);
@@ -52,7 +51,7 @@ bool CMessageHeader::IsValid() const
         return false;
 
     // Check the command string for errors
-    for (const char* p1 = pchCommand; p1 < pchCommand + COMMAND_SIZE; p1++)
+    for (const char *p1 = pchCommand; p1 < pchCommand + COMMAND_SIZE; p1++)
     {
         if (*p1 == 0)
         {
@@ -74,8 +73,6 @@ bool CMessageHeader::IsValid() const
 
     return true;
 }
-
-
 
 CAddress::CAddress() : CService()
 {
@@ -101,13 +98,13 @@ CInv::CInv()
     hash = 0;
 }
 
-CInv::CInv(int typeIn, const uint256& hashIn)
+CInv::CInv(int typeIn, const uint256 &hashIn)
 {
     type = typeIn;
     hash = hashIn;
 }
 
-CInv::CInv(const std::string& strType, const uint256& hashIn)
+CInv::CInv(const std::string &strType, const uint256 &hashIn)
 {
     unsigned int i;
     for (i = 1; i < ARRAYLEN(ppszTypeName); i++)
@@ -123,7 +120,7 @@ CInv::CInv(const std::string& strType, const uint256& hashIn)
     hash = hashIn;
 }
 
-bool operator<(const CInv& a, const CInv& b)
+bool operator<(const CInv &a, const CInv &b)
 {
     return (a.type < b.type || (a.type == b.type && a.hash < b.hash));
 }
@@ -133,7 +130,7 @@ bool CInv::IsKnownType() const
     return (type >= 1 && type < (int)ARRAYLEN(ppszTypeName));
 }
 
-const char* CInv::GetCommand() const
+const char *CInv::GetCommand() const
 {
     if (!IsKnownType())
         throw std::out_of_range(strprintf("CInv::GetCommand() : type=%d unknown type", type));
@@ -149,4 +146,3 @@ void CInv::print() const
 {
     printf("CInv(%s)\n", ToString().c_str());
 }
-
