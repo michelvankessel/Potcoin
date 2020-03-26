@@ -29,6 +29,7 @@ unsigned int nStakeSplitAge = 45 * 24 * 60 * 60; // 45 days
 // optimally each output stakes once every week so 50k * 52 = 2.6m
 // but only a fraction of the total money supply is staked on the network
 int64 nStakeCombineThreshold = 2000000 * COIN;
+int64 nStakeCombineThresholdTestNet = 10000 * COIN;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1647,7 +1648,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
-                if (GetCoinAgeWeight(block.GetBlockTime(), (int64)txNew.nTime) < nStakeSplitAge && nCredit >= nStakeCombineThreshold)
+                if (GetCoinAgeWeight(block.GetBlockTime(), (int64)txNew.nTime) < nStakeSplitAge && nCredit >= (fTestNet ? nStakeCombineThresholdTestNet : nStakeCombineThreshold))
                     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
                 if (fDebug && GetBoolArg("-printcoinstake"))
                     printf("CreateCoinStake : added kernel type=%d\n", whichType);
@@ -1674,13 +1675,13 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             if (txNew.vin.size() >= 100)
                 break;
             // Stop adding more inputs if value is already pretty significant
-            if (nCredit >= nStakeCombineThreshold)
+            if (nCredit >= (fTestNet ? nStakeCombineThresholdTestNet : nStakeCombineThreshold))
                 break;
             // Stop adding inputs if reached reserve limit
             if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
                 break;
             // Do not add additional significant input
-            if (pcoin.first->vout[pcoin.second].nValue >= nStakeCombineThreshold)
+            if (pcoin.first->vout[pcoin.second].nValue >= (fTestNet ? nStakeCombineThresholdTestNet : nStakeCombineThreshold))
                 continue;
 
             CTransaction tx;
